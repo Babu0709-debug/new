@@ -26,6 +26,6 @@ srt
 tdqm
 evdev
 
-libasound-dev
+
 portaudio19-dev
 python-pyaudio
