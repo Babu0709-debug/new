@@ -4,11 +4,11 @@ import os
 from pandasai import Agent  # Ensure this import is correct
 import speech_recognition as sr
 
-os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO"
+# Set the PandasAI API key
+os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO"  # Replace with your actual API key
 
 def analyze_data(df):
-    summary = df.describe()
-    return summary
+    return df.describe()
 
 def query_data(df, query):
     if query.lower().startswith('describe '):
@@ -18,7 +18,7 @@ def query_data(df, query):
         else:
             return f"Column '{column_name}' not found in the dataframe."
     else:
-        return
+        return "Invalid query."
 
 class StreamlitApp:
     def __init__(self):
@@ -28,16 +28,15 @@ class StreamlitApp:
         uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
         if uploaded_file is not None:
             file_extension = uploaded_file.name.split('.')[-1].lower()
-            if file_extension == 'csv':
-                self.df = pd.read_csv(uploaded_file)
-            elif file_extension in ['xlsx', 'xls']:
-                self.df = pd.read_excel(uploaded_file)
-            else:
-                st.error("Unsupported file type!")
-                return
-
-            st.success("Dataframe loaded successfully!")
-            st.dataframe(self.df)
+            try:
+                if file_extension == 'csv':
+                    self.df = pd.read_csv(uploaded_file)
+                elif file_extension in ['xlsx', 'xls']:
+                    self.df = pd.read_excel(uploaded_file)
+                st.success("Dataframe loaded successfully!")
+                st.dataframe(self.df)
+            except Exception as e:
+                st.error(f"Error loading file: {e}")
 
     def speech_to_text(self):
         recognizer = sr.Recognizer()
@@ -60,8 +59,11 @@ class StreamlitApp:
         if query:
             if self.df is not None:
                 agent = Agent(self.df)
-                result = agent.chat(query)  # Ensure this method exists and works as expected
-                st.write(result)
+                try:
+                    result = agent.chat(query)
+                    st.write(result)
+                except Exception as e:
+                    st.error(f"Error processing query: {e}")
             else:
                 st.error("Please upload a file first!")
         else:
