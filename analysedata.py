@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from pandasai import Agent  # Ensure this import is correct
 import speech_recognition as sr
+import pyaudio
 
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO"  # Replace with your actual API key
@@ -53,6 +54,9 @@ class StreamlitApp:
             return ""
         except sr.RequestError as e:
             st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            return ""
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
             return ""
 
     def process_query(self, query):
