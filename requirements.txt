@@ -25,7 +25,8 @@ openai-whisper
 srt
 tdqm
 evdev
-
+pipwin
+pyaudio
 
 
 
