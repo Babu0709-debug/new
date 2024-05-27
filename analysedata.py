@@ -1,138 +1,95 @@
-import websockets
-import asyncio
-import base64
-import json
-import pyaudio
-from streamlit_lottie import st_lottie
-import requests
-from streamlit_webrtc import WebRtcMode, webrtc_streamer
-
 import streamlit as st
+import pandas as pd
+import os
+from pandasai import Agent  # Ensure this import is correct
+import speech_recognition as sr
+import pyaudio
 
-if 'run' not in st.session_state:
-    st.session_state['run'] = False
+# Set the PandasAI API key
+os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO" 
 
-Frames_per_buffer = 3200
-Format = pyaudio.paInt16
-Channels = 1
-Rate = 16000
-p = pyaudio.PyAudio()
+def analyze_data(df):
+    return df.describe()
 
-# starts recording
-stream = p.open(
-    format=Format,
-    channels=Channels,
-    rate=Rate,
-    input=True,
-    frames_per_buffer=Frames_per_buffer
-)
+def query_data(df, query):
+    if query.lower().startswith('describe '):
+        column_name = query.split(' ')[1]
+        if column_name in df.columns:
+            return df[column_name].describe()
+        else:
+            return f"Column '{column_name}' not found in the dataframe."
+    else:
+        return "Invalid query."
 
-webrtc_ctx = webrtc_streamer(
-        key="speech-to-text",
-        mode=WebRtcMode.SENDONLY,
-        audio_receiver_size=1024,
-        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-        media_stream_constraints={"video": False, "audio": True},
-    )
+class StreamlitApp:
+    def __init__(self):
+        self.df = None
 
-def load_lottieurl(url: str):
-    r = requests.get(url)
-    if r.status_code!= 200:
-        return None
-    return r.json()
+    def upload_file(self):
+        uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
+        if uploaded_file is not None:
+            file_extension = uploaded_file.name.split('.')[-1].lower()
+            try:
+                if file_extension == 'csv':
+                    self.df = pd.read_csv(uploaded_file)
+                elif file_extension in ['xlsx', 'xls']:
+                    self.df = pd.read_excel(uploaded_file)
+                st.success("Dataframe loaded successfully!")
+                st.dataframe(self.df)
+            except Exception as e:
+                st.error(f"Error loading file: {e}")
 
-voice_animation = load_lottieurl("https://assets4.lottiefiles.com/packages/lf20_owkzfxim.json")
+    def speech_to_text(self):
+        recognizer = sr.Recognizer()
+        with sr.Microphone() as source:
+            st.info("Please say something...")
+            audio = recognizer.listen(source)
+        
+        try:
+            query = recognizer.recognize_google(audio)
+            st.success(f"You said: {query}")
+            return query
+        except sr.UnknownValueError:
+            st.error("Google Speech Recognition could not understand the audio.")
+            return ""
+        except sr.RequestError as e:
+            st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            return ""
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            return ""
 
-st.title('Create real_time transcription from your microphone')
-
-start, stop = st.columns(2)    
-
-def stop_listening():
-    st.session_state['run'] = False
-    
-
-def start_listening():
-    st.session_state['run'] = True
-    st_lottie(voice_animation, height=200)
-
-
-start.button('Start Listening', on_click= start_listening)
-
-
-stop.button('Stop Listening', on_click= stop_listening)
-
-
-endpoint_url = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
-
-async def send_receive():
-
-    print(f'Connecting websocket to url ${endpoint_url}')
-
-    async with websockets.connect(
-        endpoint_url,
-        extra_headers=(("Authorization", st.secrets.key),),
-        ping_interval=5,
-        ping_timeout=20
-    ) as _ws:
-
-        r = await asyncio.sleep(0.1)
-        print("Receiving SessionBegins ...")
-
-        session_begins = await _ws.recv()
-        print(session_begins)
-        print("Sending messages ...")
-
-        async def send():
-            while st.session_state['run']:
+    def process_query(self, query):
+        if query:
+            if self.df is not None:
+                agent = Agent(self.df)
                 try:
-                    audio_frames = webrtc_ctx.audio_receiver.get_frames(timeout=1)
-                    data = stream.read(Frames_per_buffer)
-                    data = base64.b64encode(data).decode("utf-8")
-                    json_data = json.dumps({"audio_data":str(data)})
-                    r = await _ws.send(json_data)
-
-                except websockets.exceptions.ConnectionClosedError as e:
-                    print(e)
-                    assert e.code == 4008
-                    break
-
+                    result = agent.chat(query)
+                    st.write(result)
                 except Exception as e:
-                    assert False, "Not a websocket 4008 error"
+                    st.error(f"Error processing query: {e}")
+            else:
+                st.error("Please upload a file first!")
+        else:
+            st.error("No query provided.")
 
-                r = await asyncio.sleep(0.01)
+    def chat_query(self):
+        st.write("## Query the Data")
+        
+        query = st.text_input("Enter your query:")
+        
+        if st.button("Submit Text Query"):
+            self.process_query(query)
+        
+        if st.button("Start Recording"):
+            query = self.speech_to_text()
+            self.process_query(query)
 
-            return True
+    def run(self):
+        st.title("Talk with Data")
+        self.upload_file()
+        self.chat_query()
 
-
-        async def receive():
-            while st.session_state['run']:
-                try:
-                    result_str = await _ws.recv()
-                    if json.loads(result_str)['message_type'] == 'FinalTranscript':
-                        print(json.loads(result_str)['text'])
-                        st.markdown(json.loads(result_str)['text'])
-
-                except websockets.exceptions.ConnectionClosedError as e:
-                    print(e)
-                    assert e.code == 4008
-                    break
-
-                except Exception as e:
-                    assert False, "Not a websocket 4008 error"
-
-        send_result, receive_result = await asyncio.gather(send(), receive())
-
-asyncio.run(send_receive())     
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    app = StreamlitApp()
+    app.run()
