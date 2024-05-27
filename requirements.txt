@@ -27,5 +27,5 @@ tdqm
 evdev
 
 
-portaudio19-dev
+
 python-pyaudio
