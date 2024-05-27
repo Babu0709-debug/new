@@ -1,14 +1,10 @@
 import streamlit as st
 import pandas as pd
 import os
-from pandasai import Agent
-import sounddevice as sd
-import numpy as np
-import tempfile
-import whisper
+from pandasai import Agent  # Ensure this import is correct
+import speech_recognition as sr
 
-# Set up environment variable for pandasai API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$jtX1xbqADs4395M3DE9ZcuCx/15PDyWCIe40oLHgyZqEVtvH5lEeG"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO"
 
 def analyze_data(df):
     summary = df.describe()
@@ -27,7 +23,6 @@ def query_data(df, query):
 class StreamlitApp:
     def __init__(self):
         self.df = None
-        self.whisper_model = whisper.load_model("base")
 
     def upload_file(self):
         uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
@@ -45,33 +40,27 @@ class StreamlitApp:
             st.dataframe(self.df)
 
     def speech_to_text(self):
-        st.info("Please say something...")
-
-        # Record audio using sounddevice
-        duration = 5  # seconds
-        fs = 44100  # Sample rate
-        st.info("Recording...")
-        audio_data = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype='int16')
-        sd.wait()  # Wait until recording is finished
-        audio_data = np.squeeze(audio_data)
-
-        # Save audio to a temporary file
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
-            temp_audio_file_name = temp_audio_file.name
-            sd.write(temp_audio_file_name, audio_data, fs)
+        recognizer = sr.Recognizer()
+        with sr.Microphone() as source:
+            st.info("Please say something...")
+            audio = recognizer.listen(source)
         
-        # Use whisper model to transcribe audio
-        result = self.whisper_model.transcribe(temp_audio_file_name)
-        query = result["text"]
-
-        st.success(f"You said: {query}")
-        return query
+        try:
+            query = recognizer.recognize_google(audio)
+            st.success(f"You said: {query}")
+            return query
+        except sr.UnknownValueError:
+            st.error("Google Speech Recognition could not understand the audio.")
+            return ""
+        except sr.RequestError as e:
+            st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            return ""
 
     def process_query(self, query):
         if query:
             if self.df is not None:
                 agent = Agent(self.df)
-                result = agent.chat(query)
+                result = agent.chat(query)  # Ensure this method exists and works as expected
                 st.write(result)
             else:
                 st.error("Please upload a file first!")
@@ -80,12 +69,12 @@ class StreamlitApp:
 
     def chat_query(self):
         st.write("## Query the Data")
-
+        
         query = st.text_input("Enter your query:")
-
+        
         if st.button("Submit Text Query"):
             self.process_query(query)
-
+        
         if st.button("Start Recording"):
             query = self.speech_to_text()
             self.process_query(query)
