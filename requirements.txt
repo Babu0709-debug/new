@@ -28,4 +28,4 @@ evdev
 
 
 
-python-pyaudio
+
