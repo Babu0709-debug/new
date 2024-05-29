@@ -4,7 +4,7 @@ import os
 from pandasai import Agent  # Ensure this import is correct
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO"
 
 def analyze_data(df):
     return df.describe()
@@ -77,11 +77,13 @@ class StreamlitApp:
         function handleSubmit(event) {
             event.preventDefault();
             const recognizedText = document.getElementById('recognizedText').value;
-            const streamlitInput = Streamlit.setComponentValue(recognizedText);
+            if (recognizedText) {
+                Streamlit.setComponentValue(recognizedText);
+            }
         }
         </script>
         """
-
+        
         st.markdown(speech_recognition_js, unsafe_allow_html=True)
 
     def process_query(self, query):
