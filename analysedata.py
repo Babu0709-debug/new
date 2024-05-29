@@ -1,77 +1,95 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
-import numpy as np
-import pydub
-from deepspeech import Model
-import queue
+import pandas as pd
 import os
-import urllib.request
+from pandasai import Agent  # Ensure this import is correct
+import speech_recognition as sr
+import pyaudio
 
-# Function to download model files
-def download_file(url, download_to):
-    if not os.path.exists(download_to):
-        with urllib.request.urlopen(url) as response, open(download_to, 'wb') as out_file:
-            data = response.read()
-            out_file.write(data)
+# Set the PandasAI API key
+os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO" 
 
-# Download DeepSpeech model and scorer
-model_url = "https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.pbmm"
-scorer_url = "https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer"
-model_local_path = "deepspeech-0.9.3-models.pbmm"
-scorer_local_path = "deepspeech-0.9.3-models.scorer"
-download_file(model_url, model_local_path)
-download_file(scorer_url, scorer_local_path)
+def analyze_data(df):
+    return df.describe()
 
-# Load DeepSpeech model
-model = Model(model_local_path)
-model.enableExternalScorer(scorer_local_path)
+def query_data(df, query):
+    if query.lower().startswith('describe '):
+        column_name = query.split(' ')[1]
+        if column_name in df.columns:
+            return df[column_name].describe()
+        else:
+            return f"Column '{column_name}' not found in the dataframe."
+    else:
+        return "Invalid query."
 
-# WebRTC configuration
-RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+class StreamlitApp:
+    def __init__(self):
+        self.df = None
 
-def app_speech_to_text():
-    st.header("Real-Time Speech-to-Text")
+    def upload_file(self):
+        uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
+        if uploaded_file is not None:
+            file_extension = uploaded_file.name.split('.')[-1].lower()
+            try:
+                if file_extension == 'csv':
+                    self.df = pd.read_csv(uploaded_file)
+                elif file_extension in ['xlsx', 'xls']:
+                    self.df = pd.read_excel(uploaded_file)
+                st.success("Dataframe loaded successfully!")
+                st.dataframe(self.df)
+            except Exception as e:
+                st.error(f"Error loading file: {e}")
 
-    webrtc_ctx = webrtc_streamer(
-        key="speech-to-text",
-        mode=WebRtcMode.SENDONLY,
-        rtc_configuration=RTC_CONFIGURATION,
-        media_stream_constraints={"video": False, "audio": True},
-        audio_receiver_size=1024,
-    )
+    def speech_to_text(self):
+        recognizer = sr.Recognizer()
+        with sr.Microphone() as source:
+            st.info("Please say something...")
+            audio = recognizer.listen(source)
 
-    status_indicator = st.empty()
-    text_output = st.empty()
-    stream = None
-    sound_chunk = pydub.AudioSegment.empty()
+        try:
+            query = recognizer.recognize_google(audio)
+            st.success(f"You said: {query}")
+            return query
+        except sr.UnknownValueError:
+            st.error("Google Speech Recognition could not understand the audio.")
+            return ""
+        except sr.RequestError as e:
+            st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            return ""
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            return ""
 
-    if webrtc_ctx.state.playing:
-        status_indicator.write("Model loaded and listening...")
-        while True:
-            if webrtc_ctx.audio_receiver:
-                if stream is None:
-                    stream = model.createStream()
-
+    def process_query(self, query):
+        if query:
+            if self.df is not None:
+                agent = Agent(self.df)
                 try:
-                    audio_frames = webrtc_ctx.audio_receiver.get_frames(timeout=1)
-                except queue.Empty:
-                    continue
+                    result = agent.chat(query)
+                    st.write(result)
+                except Exception as e:
+                    st.error(f"Error processing query: {e}")
+            else:
+                st.error("Please upload a file first!")
+        else:
+            st.error("No query provided.")
 
-                for audio_frame in audio_frames:
-                    sound = pydub.AudioSegment(
-                        data=audio_frame.to_ndarray().tobytes(),
-                        sample_width=audio_frame.format.bytes,
-                        frame_rate=audio_frame.sample_rate,
-                        channels=len(audio_frame.layout.channels),
-                    )
-                    sound_chunk += sound
+    def chat_query(self):
+        st.write("## Query the Data")
 
-                if len(sound_chunk) > 0:
-                    sound_chunk = sound_chunk.set_channels(1).set_frame_rate(model.sampleRate())
-                    buffer = np.array(sound_chunk.get_array_of_samples())
-                    stream.feedAudioContent(buffer)
-                    text = stream.intermediateDecode()
-                    text_output.markdown(f"**Text:** {text}")
+        query = st.text_input("Enter your query:")
+
+        if st.button("Submit Text Query"):
+            self.process_query(query)
+
+        if st.button("Start Recording"):
+            query = self.speech_to_text()
+            self.process_query(query)
+
+    def run(self):
+        st.title("Talk with Data")
+        self.upload_file()
+        self.chat_query()
 
 if __name__ == "__main__":
-    app_speech_to_text()
+    app = StreamlitApp()
+    app.run()
