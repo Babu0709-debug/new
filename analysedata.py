@@ -2,11 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 from pandasai import Agent  # Ensure this import is correct
-import speech_recognition as sr
-import pyaudio
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO" 
+os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO"
 
 def analyze_data(df):
     return df.describe()
@@ -40,23 +38,63 @@ class StreamlitApp:
                 st.error(f"Error loading file: {e}")
 
     def speech_to_text(self):
-        recognizer = sr.Recognizer()
-        with sr.Microphone() as source:
-            st.info("Please say something...")
-            audio = recognizer.listen(source)
-        
-        try:
-            query = recognizer.recognize_google(audio)
-            st.success(f"You said: {query}")
-            return query
-        except sr.UnknownValueError:
-            st.error("Google Speech Recognition could not understand the audio.")
-            return ""
-        except sr.RequestError as e:
-            st.error(f"Could not request results from Google Speech Recognition service; {e}")
-            return ""
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+        # JavaScript code for speech recognition
+        speech_recognition_js = """
+        <script>
+        function startRecognition() {
+            var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                var transcript = event.results[0][0].transcript;
+                const streamlitMessage = transcript;
+                const message = {
+                    isStreamlitMessage: true,
+                    streamlitMessage: streamlitMessage,
+                };
+                window.parent.postMessage(message, "*");
+            };
+
+            recognition.onspeechend = function() {
+                recognition.stop();
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Error occurred in recognition: ' + event.error);
+            };
+        }
+
+        window.addEventListener("message", (event) => {
+            const data = event.data;
+            if (data.isStreamlitMessage) {
+                const recognizedTextElement = document.getElementById("recognizedText");
+                recognizedTextElement.value = data.streamlitMessage;
+                const speechForm = document.getElementById("speechForm");
+                speechForm.submit();
+            }
+        });
+        </script>
+        """
+
+        # HTML form to capture speech recognition result
+        html_code = """
+        <form id="speechForm" method="post">
+            <input type="hidden" id="recognizedText" name="recognizedText">
+        </form>
+        <button onclick="startRecognition()">Start Speech Recognition</button>
+        """
+
+        # Render the HTML and JavaScript in Streamlit
+        st.markdown(html_code + speech_recognition_js, unsafe_allow_html=True)
+
+        # Capture the form submission using Streamlit's session state
+        if st.session_state.get('recognizedText'):
+            return st.session_state['recognizedText']
+        else:
             return ""
 
     def process_query(self, query):
@@ -75,12 +113,12 @@ class StreamlitApp:
 
     def chat_query(self):
         st.write("## Query the Data")
-        
+
         query = st.text_input("Enter your query:")
-        
+
         if st.button("Submit Text Query"):
             self.process_query(query)
-        
+
         if st.button("Start Recording"):
             query = self.speech_to_text()
             self.process_query(query)
