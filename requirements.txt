@@ -27,7 +27,7 @@ tdqm
 evdev
 pipwin
 pyaudio
-deepspeech
+deepspeech==0.9.3
 streamlit_webrtc
 
 
