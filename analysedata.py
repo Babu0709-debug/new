@@ -6,7 +6,7 @@ import speech_recognition as sr
 import pyaudio
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$bfv.IeS9MdkG6k7MPDUbr.QzdIs7G2TXd49VKY9jtb1pkWN./46xO" 
+os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
 
 def analyze_data(df):
     return df.describe()
