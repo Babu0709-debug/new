@@ -38,36 +38,41 @@ class StreamlitApp:
                 st.error(f"Error loading file: {e}")
 
     def speech_to_text(self):
-        # HTML and JavaScript for speech recognition
+        # HTML and JavaScript for real-time speech recognition
         speech_recognition_js = """
         <script>
+        var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        recognition.onresult = function(event) {
+            var interimTranscript = '';
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    document.getElementById('recognizedText').value = event.results[i][0].transcript;
+                    document.getElementById('speechForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+            document.getElementById('interimText').innerHTML = interimTranscript;
+        };
+
         function startRecognition() {
-            var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-
             recognition.start();
+        }
 
-            recognition.onresult = function(event) {
-                var transcript = event.results[0][0].transcript;
-                document.getElementById('recognizedText').value = transcript;
-                document.getElementById('speechForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-            };
-
-            recognition.onspeechend = function() {
-                recognition.stop();
-            };
-
-            recognition.onerror = function(event) {
-                console.error('Error occurred in recognition: ' + event.error);
-            };
+        function stopRecognition() {
+            recognition.stop();
         }
         </script>
         <form id="speechForm" method="post" onsubmit="handleSubmit(event)">
             <input type="hidden" id="recognizedText" name="recognizedText">
             <button type="button" onclick="startRecognition()">Start Speech Recognition</button>
+            <button type="button" onclick="stopRecognition()">Stop Speech Recognition</button>
         </form>
+        <p id="interimText" style="color:gray;"></p>
         <script>
         function handleSubmit(event) {
             event.preventDefault();
@@ -101,11 +106,11 @@ class StreamlitApp:
         if st.button("Submit Text Query"):
             self.process_query(query)
 
-        if st.button("Start Recording"):
-            self.speech_to_text()
-            if 'recognizedText' in st.session_state:
-                query = st.session_state['recognizedText']
-                self.process_query(query)
+        self.speech_to_text()
+
+        if 'recognizedText' in st.session_state:
+            query = st.session_state['recognizedText']
+            self.process_query(query)
 
     def run(self):
         st.title("Talk with Data")
