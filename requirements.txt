@@ -22,10 +22,6 @@ audio_recorder_streamlit
 streamlit-float
 sounddevice
 openai-whisper
-srt
-tdqm
-evdev
-pipwin
-streamlit_webrtc
+
 
 
