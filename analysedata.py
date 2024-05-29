@@ -38,7 +38,7 @@ class StreamlitApp:
                 st.error(f"Error loading file: {e}")
 
     def speech_to_text(self):
-        # JavaScript code for speech recognition
+        # HTML and JavaScript for speech recognition
         speech_recognition_js = """
         <script>
         function startRecognition() {
@@ -51,12 +51,8 @@ class StreamlitApp:
 
             recognition.onresult = function(event) {
                 var transcript = event.results[0][0].transcript;
-                const streamlitMessage = transcript;
-                const message = {
-                    isStreamlitMessage: true,
-                    streamlitMessage: streamlitMessage,
-                };
-                window.parent.postMessage(message, "*");
+                document.getElementById('recognizedText').value = transcript;
+                document.getElementById('speechForm').submit();
             };
 
             recognition.onspeechend = function() {
@@ -67,32 +63,17 @@ class StreamlitApp:
                 console.error('Error occurred in recognition: ' + event.error);
             };
         }
-
-        window.addEventListener("message", (event) => {
-            const data = event.data;
-            if (data.isStreamlitMessage) {
-                const recognizedTextElement = document.getElementById("recognizedText");
-                recognizedTextElement.value = data.streamlitMessage;
-                const speechForm = document.getElementById("speechForm");
-                speechForm.submit();
-            }
-        });
         </script>
-        """
-
-        # HTML form to capture speech recognition result
-        html_code = """
-        <form id="speechForm" method="post">
+        <form id="speechForm">
             <input type="hidden" id="recognizedText" name="recognizedText">
+            <button type="button" onclick="startRecognition()">Start Speech Recognition</button>
         </form>
-        <button onclick="startRecognition()">Start Speech Recognition</button>
         """
 
-        # Render the HTML and JavaScript in Streamlit
-        st.markdown(html_code + speech_recognition_js, unsafe_allow_html=True)
+        st.markdown(speech_recognition_js, unsafe_allow_html=True)
 
         # Capture the form submission using Streamlit's session state
-        if st.session_state.get('recognizedText'):
+        if 'recognizedText' in st.session_state:
             return st.session_state['recognizedText']
         else:
             return ""
