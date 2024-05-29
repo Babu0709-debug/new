@@ -9,9 +9,6 @@ pyyaml
 matplotlib
 numpy
 openpyxl
-streamlit==0.90.0
-pandas==1.3.3
-pandas-ai==0.1.12
 
 
 
