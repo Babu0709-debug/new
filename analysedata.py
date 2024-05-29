@@ -3,7 +3,6 @@ import pandas as pd
 import os
 from pandasai import Agent  # Ensure this import is correct
 import speech_recognition as sr
-import pyaudio
 
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
@@ -35,7 +34,7 @@ class StreamlitApp:
                 elif file_extension in ['xlsx', 'xls']:
                     self.df = pd.read_excel(uploaded_file)
                 st.success("Dataframe loaded successfully!")
-                st.dataframe(self.df)
+                st.dataframe(self.df.head())
             except Exception as e:
                 st.error(f"Error loading file: {e}")
 
@@ -44,7 +43,7 @@ class StreamlitApp:
         with sr.Microphone() as source:
             st.info("Please say something...")
             audio = recognizer.listen(source)
-
+        
         try:
             query = recognizer.recognize_google(audio)
             st.success(f"You said: {query}")
@@ -74,19 +73,20 @@ class StreamlitApp:
             st.error("No query provided.")
 
     def chat_query(self):
-        st.write("## Query the Data")
-
+        st.write("## Analyse the Data")
+        
         query = st.text_input("Enter your query:")
-
+        
         if st.button("Submit Text Query"):
             self.process_query(query)
-
-        if st.button("Start Recording"):
+        
+        if st.button("Start to talk"):
             query = self.speech_to_text()
             self.process_query(query)
 
     def run(self):
-        st.title("Talk with Data")
+        st.set_page_config(page_title="FP&A", page_icon="💻")
+        st.title("FP&A")
         self.upload_file()
         self.chat_query()
 
