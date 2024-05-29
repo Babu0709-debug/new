@@ -1,9 +1,9 @@
 google.generativeai
 seaborn
 streamlit
-SpeechRecognition==3.8.1
+SpeechRecognition
 pandas
-pandasai==2.0.43
+pandasai
 openai
 pyyaml
 matplotlib
