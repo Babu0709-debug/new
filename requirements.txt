@@ -26,7 +26,6 @@ srt
 tdqm
 evdev
 pipwin
-pyaudio
 streamlit_webrtc
 
 
