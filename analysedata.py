@@ -52,7 +52,7 @@ class StreamlitApp:
             recognition.onresult = function(event) {
                 var transcript = event.results[0][0].transcript;
                 document.getElementById('recognizedText').value = transcript;
-                document.getElementById('speechForm').submit();
+                document.getElementById('speechForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
             };
 
             recognition.onspeechend = function() {
@@ -64,19 +64,20 @@ class StreamlitApp:
             };
         }
         </script>
-        <form id="speechForm">
+        <form id="speechForm" method="post" onsubmit="handleSubmit(event)">
             <input type="hidden" id="recognizedText" name="recognizedText">
             <button type="button" onclick="startRecognition()">Start Speech Recognition</button>
         </form>
+        <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            const recognizedText = document.getElementById('recognizedText').value;
+            const streamlitInput = Streamlit.setComponentValue(recognizedText);
+        }
+        </script>
         """
 
         st.markdown(speech_recognition_js, unsafe_allow_html=True)
-
-        # Capture the form submission using Streamlit's session state
-        if 'recognizedText' in st.session_state:
-            return st.session_state['recognizedText']
-        else:
-            return ""
 
     def process_query(self, query):
         if query:
@@ -101,8 +102,10 @@ class StreamlitApp:
             self.process_query(query)
 
         if st.button("Start Recording"):
-            query = self.speech_to_text()
-            self.process_query(query)
+            self.speech_to_text()
+            if 'recognizedText' in st.session_state:
+                query = st.session_state['recognizedText']
+                self.process_query(query)
 
     def run(self):
         st.title("Talk with Data")
