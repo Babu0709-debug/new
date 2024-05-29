@@ -9,3 +9,4 @@ pyyaml
 matplotlib
 numpy
 openpyxl
+pyaudio==0.2.11
