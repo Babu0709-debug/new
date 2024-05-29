@@ -38,25 +38,21 @@ class StreamlitApp:
             except Exception as e:
                 st.error(f"Error loading file: {e}")
 
-    def speech_to_text(self):
+    def transcribe_audio(self):  # Define the method inside the class with proper indentation
         recognizer = sr.Recognizer()
         with sr.Microphone() as source:
             st.info("Please say something...")
             audio = recognizer.listen(source)
-        
+
         try:
-            query = recognizer.recognize_google(audio)
-            st.success(f"You said: {query}")
-            return query
+            text = recognizer.recognize_google(audio)
+            st.success(f"You said: {text}")
         except sr.UnknownValueError:
             st.error("Google Speech Recognition could not understand the audio.")
-            return ""
         except sr.RequestError as e:
             st.error(f"Could not request results from Google Speech Recognition service; {e}")
-            return ""
         except Exception as e:
             st.error(f"An error occurred: {e}")
-            return ""
 
     def process_query(self, query):
         if query:
@@ -81,8 +77,9 @@ class StreamlitApp:
             self.process_query(query)
         
         if st.button("Start to talk"):
-            query = self.speech_to_text()
-            self.process_query(query)
+            self.transcribe_audio()  # Call the transcribe_audio method here
+            # query = self.speech_to_text()  # You can remove this line as it's not defined
+            # self.process_query(query)  # You can remove this line as well if not needed
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
