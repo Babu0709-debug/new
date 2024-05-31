@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import os
 from pandasai import Agent  # Ensure this import is correct
-import speech_recognition as sr
-
+import speech_recognition as sr 
+#from distutils.version import LooseVersion
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
 
@@ -38,21 +38,25 @@ class StreamlitApp:
             except Exception as e:
                 st.error(f"Error loading file: {e}")
 
-    def transcribe_audio(self):  # Define the method inside the class with proper indentation
+    def speech_to_text(self):
         recognizer = sr.Recognizer()
         with sr.Microphone() as source:
             st.info("Please say something...")
             audio = recognizer.listen(source)
-
+        
         try:
-            text = recognizer.recognize_google(audio)
-            st.success(f"You said: {text}")
+            query = recognizer.recognize_google(audio)
+            st.success(f"You said: {query}")
+            return query
         except sr.UnknownValueError:
             st.error("Google Speech Recognition could not understand the audio.")
+            return ""
         except sr.RequestError as e:
             st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            return ""
         except Exception as e:
             st.error(f"An error occurred: {e}")
+            return ""
 
     def process_query(self, query):
         if query:
@@ -77,9 +81,8 @@ class StreamlitApp:
             self.process_query(query)
         
         if st.button("Start to talk"):
-            self.transcribe_audio()  # Call the transcribe_audio method here
-            # query = self.speech_to_text()  # You can remove this line as it's not defined
-            # self.process_query(query)  # You can remove this line as well if not needed
+            query = self.speech_to_text()
+            self.process_query(query)
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
