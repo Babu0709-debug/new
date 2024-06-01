@@ -3,9 +3,16 @@ import pandas as pd
 import os
 from pandasai import Agent
 import speech_recognition as sr
+from flask import Flask, request, jsonify
+from threading import Thread
+from werkzeug.serving import run_simple
+import base64
+import io
 
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
+
+app = Flask(__name__)
 
 def analyze_data(df):
     return df.describe()
@@ -38,26 +45,6 @@ class StreamlitApp:
             except Exception as e:
                 st.error(f"Error loading file: {e}")
 
-    def speech_to_text(self):
-        recognizer = sr.Recognizer()
-        with sr.Microphone() as source:
-            st.info("Please say something...")
-            audio = recognizer.listen(source)
-
-        try:
-            query = recognizer.recognize_google(audio)
-            st.success(f"You said: {query}")
-            return query
-        except sr.UnknownValueError:
-            st.error("Google Speech Recognition could not understand the audio.")
-            return ""
-        except sr.RequestError as e:
-            st.error(f"Could not request results from Google Speech Recognition service; {e}")
-            return ""
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            return ""
-
     def process_query(self, query):
         if query:
             if self.df is not None:
@@ -81,14 +68,69 @@ class StreamlitApp:
             self.process_query(query)
 
         if st.button("Start to talk"):
-            query = self.speech_to_text()
-            self.process_query(query)
+            st.write('<script>startRecording();</script>', unsafe_allow_html=True)
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
         self.chat_query()
+
+# Flask route to handle audio data
+@app.route('/upload', methods=['POST'])
+def upload_audio():
+    data = request.json
+    audio_data = base64.b64decode(data['audio'].split(',')[1])
+    recognizer = sr.Recognizer()
+    audio_file = io.BytesIO(audio_data)
+    with sr.AudioFile(audio_file) as source:
+        audio = recognizer.record(source)
+
+    try:
+        text = recognizer.recognize_google(audio)
+        return jsonify({"message": f"Transcription: {text}"})
+    except sr.UnknownValueError:
+        return jsonify({"message": "Could not understand audio"})
+    except sr.RequestError:
+        return jsonify({"message": "Could not request results"})
+
+# Run Flask server in a separate thread
+def run_flask():
+    run_simple('0.0.0.0', 5000, app)
+
+thread = Thread(target=run_flask)
+thread.start()
+
+# JavaScript code to capture audio
+st.markdown("""
+<script>
+  async function startRecording() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    let chunks = [];
+    mediaRecorder.ondataavailable = event => chunks.push(event.data);
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = function() {
+        const base64data = reader.result;
+        fetch('/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ audio: base64data })
+        }).then(response => response.json()).then(data => {
+          alert(data.message);
+        });
+      }
+    };
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), 5000); // Record for 5 seconds
+  }
+</script>
+""", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     app = StreamlitApp()
