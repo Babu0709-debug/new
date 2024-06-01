@@ -16,4 +16,5 @@ requests
 opencv-python-headless
 av
 streamlit-webrtc
+streamlit_mic_recorder 
 
