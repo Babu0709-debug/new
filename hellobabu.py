@@ -38,9 +38,27 @@ PROTOTXT_URL = "https://github.com/robmarkcole/object-detection-app/raw/master/m
 PROTOTXT_LOCAL_PATH = ROOT / "./models/MobileNetSSD_deploy.prototxt.txt"
 
 CLASSES = [
-    "background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car",
-    "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person",
-    "pottedplant", "sheep", "sofa", "train", "tvmonitor",
+    "background",
+    "aeroplane",
+    "bicycle",
+    "bird",
+    "boat",
+    "bottle",
+    "bus",
+    "car",
+    "cat",
+    "chair",
+    "cow",
+    "diningtable",
+    "dog",
+    "horse",
+    "motorbike",
+    "person",
+    "pottedplant",
+    "sheep",
+    "sofa",
+    "train",
+    "tvmonitor",
 ]
 
 class Detection(NamedTuple):
@@ -135,9 +153,7 @@ class AudioProcessor(AudioProcessorBase):
             audio_data = self.audio_data_queue.get()
             audio = sr.AudioData(audio_data.tobytes(), 16000, 2)  # Adjust the sample rate if needed
             try:
-                with sr.AudioFile(audio) as source:
-                    audio_data = self.recognizer.record(source)
-                text = self.recognizer.recognize_google(audio_data)
+                text = self.recognizer.recognize_google(audio)
                 st.success(f"You said: {text}")
                 return text
             except sr.UnknownValueError:
@@ -245,5 +261,4 @@ if st.checkbox("Show the detected labels", value=True):
         while True:
             result = result_queue.get()
             labels_placeholder.table(result)
-
 
