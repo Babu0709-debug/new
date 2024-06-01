@@ -71,7 +71,9 @@ class StreamlitApp:
             self.process_query(query)
         
         if st.button("Start to talk"):
-            pass  # We'll handle microphone input in the WebRTC streamer
+            query = self.recv()
+            self.process_query(query)
+            #pass  # We'll handle microphone input in the WebRTC streamer
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
