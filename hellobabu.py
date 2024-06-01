@@ -34,19 +34,21 @@ class StreamlitApp:
             except Exception as e:
                 st.error(f"Error loading file: {e}")
 
-    def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
+    def recv(self, frame: av.AudioFrame) -> str:
         audio_data = frame.to_ndarray()
         audio = sr.AudioData(audio_data.tobytes(), frame.sample_rate, frame.channels)
         try:
             text = self.recognizer.recognize_google(audio)
             st.success(f"You said: {text}")
+            return text  # Return the recognized text
         except sr.UnknownValueError:
             st.error("Google Speech Recognition could not understand the audio.")
         except sr.RequestError as e:
             st.error(f"Could not request results from Google Speech Recognition service; {e}")
         except Exception as e:
             st.error(f"An error occurred: {e}")
-        return frame
+
+        return ""  # Return an empty string if recognition fails
 
     def process_query(self, query):
         if query:
@@ -71,9 +73,9 @@ class StreamlitApp:
             self.process_query(query)
         
         if st.button("Start to talk"):
-            query = self.recv()
-            self.process_query(query)
-            #pass  # We'll handle microphone input in the WebRTC streamer
+            # Don't call self.recv() directly
+            # Instead, let it be called by the WebRTC streamer
+            pass  # We'll handle microphone input in the WebRTC streamer
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
