@@ -15,10 +15,24 @@ from streamlit_webrtc import WebRtcMode, webrtc_streamer, AudioProcessorBase
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
 
-class AudioProcessor(AudioProcessorBase):
-    def __init__(self) -> None:
-        super().__init__()
+class StreamlitApp:
+    def __init__(self):
+        self.df = None
         self.recognizer = sr.Recognizer()
+
+    def upload_file(self):
+        uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
+        if uploaded_file is not None:
+            file_extension = uploaded_file.name.split('.')[-1].lower()
+            try:
+                if file_extension == 'csv':
+                    self.df = pd.read_csv(uploaded_file)
+                elif file_extension in ['xlsx', 'xls']:
+                    self.df = pd.read_excel(uploaded_file)
+                st.success("Dataframe loaded successfully!")
+                st.dataframe(self.df.head())
+            except Exception as e:
+                st.error(f"Error loading file: {e}")
 
     def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
         audio_data = frame.to_ndarray()
@@ -33,53 +47,6 @@ class AudioProcessor(AudioProcessorBase):
         except Exception as e:
             st.error(f"An error occurred: {e}")
         return frame
-
-class StreamlitApp:
-    def __init__(self):
-        self.df = None
-        self.audio_processor = AudioProcessor()
-
-    def upload_file(self):
-        with st.spinner('Waiting for microphone access...'):
-            recognizer = sr.Recognizer()
-            with sr.Microphone() as source:
-                st.info("Please say something...")
-                recognizer.adjust_for_ambient_noise(source)
-                audio = recognizer.listen(source)
-        st.success("Microphone access granted!")
-        
-        uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
-        if uploaded_file is not None:
-            file_extension = uploaded_file.name.split('.')[-1].lower()
-            try:
-                if file_extension == 'csv':
-                    self.df = pd.read_csv(uploaded_file)
-                elif file_extension in ['xlsx', 'xls']:
-                    self.df = pd.read_excel(uploaded_file)
-                st.success("Dataframe loaded successfully!")
-                st.dataframe(self.df.head())
-            except Exception as e:
-                st.error(f"Error loading file: {e}")
-
-    def speech_to_text(self):
-        recognizer = sr.Recognizer()
-        with sr.Microphone() as source:
-            st.info("Please say something...")
-            audio = recognizer.listen(source)
-        
-        try:
-            query = recognizer.recognize_google(audio)
-            st.success(f"You said: {query}")
-            return query
-        except sr.UnknownValueError:
-            st.error("Google Speech Recognition could not understand the audio.")
-            return ""
-        except sr.RequestError as e:
-            st.error(f"Could not request results from Google Speech Recognition service; {e}")
-            return ""
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            return ""
 
     def process_query(self, query):
         if query:
@@ -96,7 +63,7 @@ class StreamlitApp:
             st.error("No query provided.")
 
     def chat_query(self):
-        st.write("## Analyse the Data")
+        st.write("## Analyze the Data")
         
         query = st.text_input("Enter your query:")
         
@@ -104,8 +71,7 @@ class StreamlitApp:
             self.process_query(query)
         
         if st.button("Start to talk"):
-            query = self.speech_to_text()
-            self.process_query(query)
+            pass  # We'll handle microphone input in the WebRTC streamer
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
@@ -120,7 +86,7 @@ class StreamlitApp:
             rtc_configuration={
                 "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}],  # Default STUN server
             },
-            audio_frame_callback=self.audio_processor.recv,
+            audio_frame_callback=self.recv,
             media_stream_constraints={"audio": True},
             async_processing=True,
         )
