@@ -12,3 +12,8 @@ openpyxl
 pyaudio==0.2.11
 Flask
 werkzeug
+requests
+opencv-python-headless
+av
+streamlit-webrtc
+
