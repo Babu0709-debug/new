@@ -50,6 +50,26 @@ class StreamlitApp:
 
         return ""  # Return an empty string if recognition fails
 
+    def speech_to_text(self):
+        recognizer = sr.Recognizer()
+        with sr.Microphone() as source:
+            st.info("Please say something...")
+            audio = recognizer.listen(source)
+        
+        try:
+            query = recognizer.recognize_google(audio)
+            st.success(f"You said: {query}")
+            return query
+        except sr.UnknownValueError:
+            st.error("Google Speech Recognition could not understand the audio.")
+            return ""
+        except sr.RequestError as e:
+            st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            return ""
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            return ""
+
     def process_query(self, query):
         if query:
             if self.df is not None:
@@ -73,9 +93,8 @@ class StreamlitApp:
             self.process_query(query)
         
         if st.button("Start to talk"):
-            # Don't call self.recv() directly
-            # Instead, let it be called by the WebRTC streamer
-            pass  # We'll handle microphone input in the WebRTC streamer
+            query = self.speech_to_text()
+            self.process_query(query)
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
