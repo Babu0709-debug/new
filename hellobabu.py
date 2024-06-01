@@ -40,6 +40,14 @@ class StreamlitApp:
         self.audio_processor = AudioProcessor()
 
     def upload_file(self):
+        with st.spinner('Waiting for microphone access...'):
+            recognizer = sr.Recognizer()
+            with sr.Microphone() as source:
+                st.info("Please say something...")
+                recognizer.adjust_for_ambient_noise(source)
+                audio = recognizer.listen(source)
+        st.success("Microphone access granted!")
+        
         uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
         if uploaded_file is not None:
             file_extension = uploaded_file.name.split('.')[-1].lower()
