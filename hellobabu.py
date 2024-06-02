@@ -18,4 +18,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-speech_to_text(language='en')
+st.write(speech_to_text(language='en'))
