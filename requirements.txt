@@ -17,4 +17,4 @@ opencv-python-headless
 av
 streamlit-webrtc
 streamlit_mic_recorder 
-google.cloud
+google-cloud-speech
