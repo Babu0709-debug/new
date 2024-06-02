@@ -3,7 +3,6 @@ import pandas as pd
 import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
 from pandasai import Agent
-import speech_recognition as sr 
 
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
@@ -25,22 +24,21 @@ class StreamlitApp:
                 st.dataframe(self.df.head())
             except Exception as e:
                 st.error(f"Error loading file: {e}")
+
+        # Process speech input when "Start to talk" button is clicked
+        
             speech_input = speech_to_text(language='en')
             st.write(speech_input)
             if speech_input:
                 if self.df is not None:
                     agent = Agent(self.df)  # Define agent here
-                    
                     result = agent.chat(speech_input)
                     st.write(result)
-            else:
-                st.error("Please provide a query.")
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
-        
 
 if __name__ == "__main__":
     app = StreamlitApp()
