@@ -6,6 +6,7 @@ from streamlit_webrtc import webrtc_streamer, AudioProcessorBase, WebRtcMode
 def main():
     st.title("Microphone Access Demo")
     st.write("Click the button below to start recording from your microphone.")
+    st.write(speech_to_text(language='en'))
 
     webrtc_ctx = webrtc_streamer(
         key="microphone",
