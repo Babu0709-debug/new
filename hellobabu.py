@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-from streamlit_mic_recorder import mic_recorder, speech_to_text
-from pandasai import Agent
-import speech_recognition as sr 
+from google.cloud import speech_v1p1beta1 as speech
 
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
@@ -25,22 +23,45 @@ class StreamlitApp:
                 st.dataframe(self.df.head())
             except Exception as e:
                 st.error(f"Error loading file: {e}")
-            
-            
+
+    def speech_to_text(self, language='en-US'):
+        client = speech.SpeechClient()
+
+        config = {
+            'encoding': speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            'sample_rate_hertz': 16000,
+            'language_code': language,
+        }
+
+        audio = {
+            'content': b'',  # Replace with the audio content
+        }
+
+        response = client.recognize(config=config, audio=audio)
+
+        if response.results:
+            return response.results[0].alternatives[0].transcript
+        else:
+            return None
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
-        speech_input = speech_to_text(language='en')
-        st.write(speech_input)
-        if speech_input:
-            if self.df is not None:
-                    agent = Agent(self.df)  # Define agent here
-                    
-                    result = agent.chat(speech_input)
-                    st.write(result)
         
+        # Capture speech input and process it
+        if st.button("Start to talk"):
+            speech_input = self.speech_to_text(language='en-US')
+            st.write(speech_input)
+            if speech_input:
+                if self.df is not None:
+                    # Process speech input using Agent
+                    # agent = Agent(self.df)  # Define agent here
+                    # result = agent.chat(speech_input)
+                    # st.write(result)
+                    st.write("Speech input processed successfully.")
+                else:
+                    st.error("Please upload a file first.")
 
 if __name__ == "__main__":
     app = StreamlitApp()
