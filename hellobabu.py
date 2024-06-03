@@ -39,7 +39,7 @@ class StreamlitApp:
                     agent = Agent(self.df)  # Define agent here
                     st.write(Agent(self.df))
                     st.write(agent)
-                    result = agent.chat(self.speech_input)
+                    result = agent.get_dfs(self.speech_input)
                     st.write(result)
         
 
