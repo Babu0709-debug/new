@@ -3,10 +3,10 @@ import pandas as pd
 import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
 from pandasai import Agent
-import speech_recognition as sr 
+import speech_recognition as sr
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
+os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
 
 class StreamlitApp:
     def __init__(self):
@@ -40,6 +40,7 @@ class StreamlitApp:
                 st.write(f"DataFrame head:\n{self.df.head()}")
                 try:
                     agent = Agent(self.df)  # Define agent here
+                    st.write(f"Agent initialized: {agent}")
                     result = agent.chat(self.speech_input)
                     st.write(result)
                 except Exception as e:
