@@ -11,6 +11,7 @@ os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085
 class StreamlitApp:
     def __init__(self):
         self.df = None
+        self.speech_input = None
 
     def upload_file(self):
         uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
@@ -25,23 +26,26 @@ class StreamlitApp:
                 st.dataframe(self.df.head())
             except Exception as e:
                 st.error(f"Error loading file: {e}")
-            
-            
+                self.df = None
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
+
         self.speech_input = speech_to_text(language='en')
-        st.write(self.speech_input)
+        st.write(f"Speech input: {self.speech_input}")
+
         if self.speech_input:
             if self.df is not None:
+                try:
                     agent = Agent(self.df)  # Define agent here
-                    st.write(Agent(self.df))
-                    st.write(agent)
                     result = agent.chat(self.speech_input)
                     st.write(result)
-        
+                except Exception as e:
+                    st.error(f"Error during agent chat: {e}")
+            else:
+                st.warning("No dataframe loaded. Please upload a file.")
 
 if __name__ == "__main__":
     app = StreamlitApp()
