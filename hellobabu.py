@@ -3,10 +3,10 @@ import pandas as pd
 import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
 from pandasai import Agent
-import speech_recognition as sr 
+import speech_recognition as sr
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
+os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
 
 class StreamlitApp:
     def __init__(self):
@@ -27,6 +27,11 @@ class StreamlitApp:
             except Exception as e:
                 st.error(f"Error loading file: {e}")
                 self.df = None
+            finally:
+                st.write(f"Uploaded file extension: {file_extension}")
+                st.write(f"Dataframe shape: {self.df.shape if self.df is not None else 'None'}")
+        else:
+            st.warning("Please upload a file.")
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
@@ -40,12 +45,17 @@ class StreamlitApp:
             if self.df is not None:
                 try:
                     agent = Agent(self.df)  # Define agent here
+                    st.write(f"Agent initialized with dataframe of shape: {self.df.shape}")
                     result = agent.chat(self.speech_input)
                     st.write(result)
+                except AttributeError as e:
+                    st.error(f"AttributeError during agent chat: {e}")
                 except Exception as e:
                     st.error(f"Error during agent chat: {e}")
             else:
                 st.warning("No dataframe loaded. Please upload a file.")
+        else:
+            st.warning("No speech input detected. Please try speaking again.")
 
 if __name__ == "__main__":
     app = StreamlitApp()
