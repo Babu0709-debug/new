@@ -2,11 +2,15 @@ import streamlit as st
 import pandas as pd
 import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
-from pandasai.agent.base import Agent  # Ensure this import points to your modified Agent class
+from pandasai.agent.base import Agent
 import speech_recognition as sr
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
+os.environ["PANDASAI_API_KEY"] = "your_pandasai_api_key_here"
 
 class StreamlitApp:
     def __init__(self):
@@ -25,6 +29,7 @@ class StreamlitApp:
                 st.dataframe(self.df.head())
             except Exception as e:
                 st.error(f"Error loading file: {e}")
+                logging.error(f"Error loading file: {e}")
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
@@ -38,13 +43,16 @@ class StreamlitApp:
             if self.df is not None:
                 st.write(f"DataFrame type: {type(self.df)}")
                 st.write(f"DataFrame head:\n{self.df.head()}")
+                logging.info(f"DataFrame head: {self.df.head()}")
                 try:
                     agent = Agent(self.df)  # Define agent here
                     st.write(f"Agent initialized: {agent}")
                     result = agent.chat(self.speech_input)
                     st.write(result)
+                    logging.info(f"Agent chat result: {result}")
                 except Exception as e:
                     st.error(f"Error processing speech input with Agent: {e}")
+                    logging.error(f"Error processing speech input with Agent: {e}")
             else:
                 st.error("Please upload a DataFrame first.")
         else:
