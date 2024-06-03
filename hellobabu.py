@@ -34,7 +34,7 @@ class StreamlitApp:
         self.upload_file()
         self.speech_input = st.write(speech_to_text(language='en'))
         st.write(self.speech_input)
-        if self.speech_input:
+        if st.write(self.speech_input):
             if self.df is not None:
                     agent = Agent(self.df)  # Define agent here
                     result = agent.chat(st.write(self.speech_input))
