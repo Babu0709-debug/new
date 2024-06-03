@@ -37,7 +37,7 @@ class StreamlitApp:
         #if self.speech_input:
         if self.df is not None:
             agent = Agent(self.df)  # Define agent here
-            result = agent.chat(st.write(speech_to_text(language='en')))
+            result = agent.chat("Count customers")
             st.write(result)
         
 
