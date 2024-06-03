@@ -26,20 +26,26 @@ class StreamlitApp:
             except Exception as e:
                 st.error(f"Error loading file: {e}")
             
-            
-
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
-        #self.speech_input = speech_to_text(language='en')
-        #st.write(self.speech_input)
-        #if self.speech_input:
-        #if self.df is not None:
-        agent = Agent(self.df)  # Define agent here
-        result = agent.chat("Top 5 sales")
-        st.write(result)
         
+        self.speech_input = speech_to_text(language='en')
+        st.write(f"Speech Input: {self.speech_input}")
+        
+        if self.speech_input:
+            if self.df is not None:
+                try:
+                    agent = Agent(self.df)  # Define agent here
+                    result = agent.chat(self.speech_input)
+                    st.write(result)
+                except Exception as e:
+                    st.error(f"Error processing speech input with Agent: {e}")
+            else:
+                st.error("Please upload a DataFrame first.")
+        else:
+            st.info("Please provide a speech input.")
 
 if __name__ == "__main__":
     app = StreamlitApp()
