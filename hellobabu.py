@@ -2,11 +2,8 @@ import streamlit as st
 import pandas as pd
 import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
-from pandasai.agent.base import Agent
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+from pandasai import Agent
+import speech_recognition as sr 
 
 # Set the PandasAI API key
 os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
@@ -26,47 +23,24 @@ class StreamlitApp:
                     self.df = pd.read_excel(uploaded_file)
                 st.success("Dataframe loaded successfully!")
                 st.dataframe(self.df.head())
-                logging.info(f"DataFrame loaded: {self.df.head()}")
             except Exception as e:
                 st.error(f"Error loading file: {e}")
-                logging.error(f"Error loading file: {e}")
+            
+            
 
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
-
         self.speech_input = speech_to_text(language='en')
-        st.write(f"Speech Input: {self.speech_input}")
-        logging.info(f"Speech Input: {self.speech_input}")
-
+        st.write(self.speech_input)
         if self.speech_input:
             if self.df is not None:
-                st.write(f"DataFrame type: {type(self.df)}")
-                st.write(f"DataFrame head:\n{self.df.head()}")
-                logging.info(f"DataFrame type: {type(self.df)}")
-                logging.info(f"DataFrame head:\n{self.df.head()}")
-                try:
-                    agent = Agent(self.df)
-                    st.write(f"Agent initialized: {agent}")
-                    logging.info(f"Agent initialized: {agent}")
-
-                    # Debugging agent.chat method
-                    try:
-                        result = agent.chat(self.speech_input)
-                        st.write(result)
-                        logging.info(f"Agent chat result: {result}")
-                    except Exception as e:
-                        st.error(f"Error in agent.chat method: {e}")
-                        logging.error(f"Error in agent.chat method: {e}")
-
-                except Exception as e:
-                    st.error(f"Error initializing Agent: {e}")
-                    logging.error(f"Error initializing Agent: {e}")
-            else:
-                st.error("Please upload a DataFrame first.")
-        else:
-            st.info("Please provide a speech input.")
+                    agent = Agent(self.df)  # Define agent here
+                    st.write(agent)
+                    result = agent.chat(self.speech_input)
+                    st.write(result)
+        
 
 if __name__ == "__main__":
     app = StreamlitApp()
