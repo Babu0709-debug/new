@@ -38,7 +38,7 @@ class StreamlitApp:
         #if self.df is not None:
         agent = Agent(self.df)  # Define agent here
         result = agent.chat("Count customers")
-        st.write(result)
+        result
         
 
 if __name__ == "__main__":
