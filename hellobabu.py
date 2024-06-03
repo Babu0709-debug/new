@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
-from pandasai import Agent
+# Assuming you have access to the modified Agent class
+from pandasai.agent.base import Agent  # Ensure this import points to your modified Agent class
 import speech_recognition as sr
 
 # Set the PandasAI API key
