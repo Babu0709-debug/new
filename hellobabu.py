@@ -32,15 +32,14 @@ class StreamlitApp:
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
-        
-        #if st.write(self.speech_input):
-        if self.df is not None:
-            agent = Agent(self.df)  # Define agent here
-            #self.speech_input = st.write(speech_to_text(language='en'))
-           #st.write(self.speech_input)
-            st.write(self.df.head())
-            result = agent.chat("Show me no of customers count by region")
-            st.write(result)
+        self.speech_input = speech_to_text(language='en')
+        st.write(self.speech_input)
+        if self.speech_input:
+            if self.df is not None:
+                    agent = Agent(self.df)  # Define agent here
+                    
+                    result = agent.chat(self.speech_input)
+                    st.write(result)
         
 
 if __name__ == "__main__":
