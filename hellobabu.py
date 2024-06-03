@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "your_pandasai_api_key_here"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
 
 class StreamlitApp:
     def __init__(self):
