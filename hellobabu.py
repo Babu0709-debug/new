@@ -46,8 +46,11 @@ class StreamlitApp:
                 try:
                     agent = Agent(self.df)  # Define agent here
                     st.write(f"Agent initialized with dataframe of shape: {self.df.shape}")
-                    result = agent.chat(self.speech_input)
-                    st.write(result)
+                    if agent is None:
+                        st.error("Failed to initialize Agent.")
+                    else:
+                        result = agent.chat(self.speech_input)
+                        st.write(result)
                 except AttributeError as e:
                     st.error(f"AttributeError during agent chat: {e}")
                 except Exception as e:
