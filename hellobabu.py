@@ -38,7 +38,7 @@ class StreamlitApp:
             agent = Agent(self.df)  # Define agent here
             #self.speech_input = st.write(speech_to_text(language='en'))
            #st.write(self.speech_input)
-            result = agent.chat(st.write(speech_to_text(language='en')))
+            result = agent.chat("Show me no of customers count by region")
             st.write(result)
         
 
