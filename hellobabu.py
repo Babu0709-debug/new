@@ -25,7 +25,7 @@ class StreamlitApp:
                 st.dataframe(self.df.head())
             except Exception as e:
                 st.error(f"Error loading file: {e}")
-            
+
     def run(self):
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
@@ -36,6 +36,8 @@ class StreamlitApp:
         
         if self.speech_input:
             if self.df is not None:
+                st.write(f"DataFrame type: {type(self.df)}")
+                st.write(f"DataFrame head:\n{self.df.head()}")
                 try:
                     agent = Agent(self.df)  # Define agent here
                     result = agent.chat(self.speech_input)
