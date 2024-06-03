@@ -49,12 +49,20 @@ class StreamlitApp:
                     if agent is None:
                         st.error("Failed to initialize Agent.")
                     else:
-                        result = agent.chat(self.speech_input)
-                        st.write(result)
+                        try:
+                            result = agent.chat(self.speech_input)
+                            if result is None:
+                                st.error("Agent returned None.")
+                            else:
+                                st.write(result)
+                        except AttributeError as e:
+                            st.error(f"AttributeError during agent chat: {e}")
+                        except Exception as e:
+                            st.error(f"Error during agent chat: {e}")
                 except AttributeError as e:
-                    st.error(f"AttributeError during agent chat: {e}")
+                    st.error(f"AttributeError during agent initialization: {e}")
                 except Exception as e:
-                    st.error(f"Error during agent chat: {e}")
+                    st.error(f"Error during agent initialization: {e}")
             else:
                 st.warning("No dataframe loaded. Please upload a file.")
         else:
