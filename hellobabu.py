@@ -32,11 +32,12 @@ class StreamlitApp:
         st.set_page_config(page_title="FP&A", page_icon="💻")
         st.title("FP&A")
         self.upload_file()
-        self.speech_input = st.write(speech_to_text(language='en'))
-        st.write(self.speech_input)
-        if st.write(self.speech_input):
+        
+        #if st.write(self.speech_input):
             if self.df is not None:
                     agent = Agent(self.df)  # Define agent here
+                    self.speech_input = st.write(speech_to_text(language='en'))
+                    st.write(self.speech_input)
                     result = agent.chat(self.speech_input)
                     st.write(result)
         
