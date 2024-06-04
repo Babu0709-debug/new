@@ -50,12 +50,12 @@ class StreamlitApp:
                         st.error("Failed to initialize Agent.")
                     else:
                         try:
-                            st.write(type(self.speech_input))
+                            #st.write(type(self.speech_input))
                             result = agent.chat(self.speech_input)
                             if result is None:
                                 st.error("Agent returned None.")
                             else:
-                                st.write(result)
+                                st.write(type(result))
                         except AttributeError as e:
                             st.error(f"AttributeError during agent chat: {e}")
                         except Exception as e:
