@@ -55,7 +55,7 @@ class StreamlitApp:
                             if result is None:
                                 st.error("Agent returned None.")
                             else:
-                                st.write(type(result))
+                                st.write(result)
                         except AttributeError as e:
                             st.error(f"AttributeError during agent chat: {e}")
                         except Exception as e:
