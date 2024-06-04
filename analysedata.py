@@ -64,7 +64,7 @@ class StreamlitApp:
                 agent = Agent(self.df)
                 try:
                     result = agent.chat(query)
-                    st.write(result)
+                    st.write(type(result))
                 except Exception as e:
                     st.error(f"Error processing query: {e}")
             else:
