@@ -51,7 +51,7 @@ class StreamlitApp:
                     else:
                         try:
                             st.write(type(self.speech_input))
-                            result = agent.chat("Count Customers")
+                            result = agent.chat(self.speech_input)
                             if result is None:
                                 st.error("Agent returned None.")
                             else:
