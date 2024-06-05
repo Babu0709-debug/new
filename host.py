@@ -21,7 +21,7 @@ if uploaded_file is not None:
     
     try:
         agent = Agent(df)
-        
+        query = st.write(speech_to_text(language='en'))
         if query:
             result = agent.chat(query)
             st.write(result)
