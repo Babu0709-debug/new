@@ -20,9 +20,10 @@ if uploaded_file is not None:
     st.dataframe(df.head())
     query = st.write(speech_to_text(language='en'))
     try:
+        agent = Agent(df)
         result = agent.chat(query)
         if query:
-            agent = Agent(df)
+            
             st.write(result)
         else:
             st.write("Could not recognize any speech. Please try again.")
