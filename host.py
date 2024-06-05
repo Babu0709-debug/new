@@ -18,7 +18,7 @@ if uploaded_file is not None:
         df = pd.read_excel(uploaded_file)
     
     st.dataframe(df.head())
-    
+    query = st.write(speech_to_text(language='en'))
     try:
         query = speech_to_text(language='en')
         if query:
