@@ -30,7 +30,8 @@ if uploaded_file:
         st.write("Record your query:")
         audio_dict = mic_recorder()
 
-        if 'audio_data' in audio_dict:
+        # Check if audio_dict is not None and contains 'audio_data'
+        if audio_dict and 'audio_data' in audio_dict:
             audio_bytes = audio_dict['audio_data']
 
             recognizer = sr.Recognizer()
@@ -54,6 +55,8 @@ if uploaded_file:
 
             # Clean up temporary audio file
             os.remove(audio_file_path)
+        else:
+            st.error("No audio data received. Please try recording your query again.")
 
     except Exception as e:
         st.error(f"Error processing file: {e}")
