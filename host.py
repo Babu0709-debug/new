@@ -15,4 +15,3 @@ agent = Agent(df)
 result = agent.chat(query)
 st.write(result)
     
-    
