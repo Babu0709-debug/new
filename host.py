@@ -28,9 +28,11 @@ if uploaded_file:
 
         # Record and convert speech to text
         st.write("Record your query:")
-        audio_bytes = mic_recorder()
+        audio_dict = mic_recorder()
 
-        if audio_bytes:
+        if 'audio_data' in audio_dict:
+            audio_bytes = audio_dict['audio_data']
+
             recognizer = sr.Recognizer()
             audio_file_path = "temp_audio.wav"
 
