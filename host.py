@@ -4,7 +4,7 @@ import os
 from pandasai import Agent
 import speech_recognition as sr
 
-os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$Y4tNL8kuX/hNELAySt3JHutl9V.7OPoobHWmUorX0bXR75.zOzhEi"
 
 def analyze_data(df):
     return df.describe()
