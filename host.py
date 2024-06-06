@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-from streamlit_mic_recorder import mic_recorder, speech_to_text
+from streamlit_mic_recorder import mic_recorder
 from pandasai import Agent
 import speech_recognition as sr
 
@@ -28,11 +28,18 @@ if uploaded_file:
 
         # Record and convert speech to text
         st.write("Record your query:")
-        audio_bytes = mic_recorder(language='en')
-        
+        audio_bytes = mic_recorder()
+
         if audio_bytes:
             recognizer = sr.Recognizer()
-            with sr.AudioFile(audio_bytes) as source:
+            audio_file_path = "temp_audio.wav"
+
+            # Save audio bytes to a temporary file
+            with open(audio_file_path, "wb") as f:
+                f.write(audio_bytes)
+
+            # Recognize speech using SpeechRecognition
+            with sr.AudioFile(audio_file_path) as source:
                 audio_data = recognizer.record(source)
                 query = recognizer.recognize_google(audio_data)
                 st.write(f"Your query: {query}")
@@ -42,6 +49,10 @@ if uploaded_file:
                 result = agent.chat(query)
                 st.write("Result:")
                 st.write(result)
+
+            # Clean up temporary audio file
+            os.remove(audio_file_path)
+
     except Exception as e:
         st.error(f"Error processing file: {e}")
 else:
