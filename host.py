@@ -5,7 +5,7 @@ from streamlit_mic_recorder import mic_recorder, speech_to_text
 from pandasai import Agent
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$BvCK6YxJ2CH1SB1UFYCwr.JtZUXsRwUd4uiRpEL8pgU.9zGD7sRd2"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$BvCK6YxJ2CH1SB1UFYCwr.JtZUXsRwUd4uiRpEL8pgU.9zGD7sRd2"  # Replace with your actual API key
 
 # Streamlit app header
 st.title("CSV/Excel File Analysis with Voice Query")
