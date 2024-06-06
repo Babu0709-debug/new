@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 import os
-from pandasai import Agent 
-import speech_recognition as sr 
+from pandasai import Agent
+import speech_recognition as sr
 
-os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S" 
+os.environ["PANDASAI_API_KEY"] = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
 
 def analyze_data(df):
     return df.describe()
@@ -36,6 +36,7 @@ class StreamlitApp:
                 st.dataframe(self.df.head())
             except Exception as e:
                 st.error(f"Error loading file: {e}")
+                self.df = None  # Ensure df is set to None if there's an error
 
     def speech_to_text(self):
         recognizer = sr.Recognizer()
