@@ -21,7 +21,7 @@ def query_data(df, query):
 
 class StreamlitApp:
     def __init__(self):
-        self.df = None
+        self.df = []
 
     def upload_file(self):
         uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
