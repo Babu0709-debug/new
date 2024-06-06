@@ -31,32 +31,40 @@ if uploaded_file:
         audio_dict = mic_recorder()
 
         # Check if audio_dict is not None and contains 'audio_data'
-        if audio_dict and 'audio_data' in audio_dict:
+        if audio_dict is None:
+            st.error("mic_recorder returned None. Please ensure your microphone is working and try again.")
+        elif 'audio_data' not in audio_dict:
+            st.error("No audio data found in the recording. Please try recording your query again.")
+        else:
             audio_bytes = audio_dict['audio_data']
-
-            recognizer = sr.Recognizer()
-            audio_file_path = "temp_audio.wav"
-
+            
             # Save audio bytes to a temporary file
+            audio_file_path = "temp_audio.wav"
             with open(audio_file_path, "wb") as f:
                 f.write(audio_bytes)
 
             # Recognize speech using SpeechRecognition
-            with sr.AudioFile(audio_file_path) as source:
-                audio_data = recognizer.record(source)
-                query = recognizer.recognize_google(audio_data)
-                st.write(f"Your query: {query}")
+            recognizer = sr.Recognizer()
+            try:
+                with sr.AudioFile(audio_file_path) as source:
+                    audio_data = recognizer.record(source)
+                    query = recognizer.recognize_google(audio_data)
+                    st.write(f"Your query: {query}")
 
-                # Use PandasAI to analyze the query
-                agent = Agent(df)
-                result = agent.chat(query)
-                st.write("Result:")
-                st.write(result)
+                    # Use PandasAI to analyze the query
+                    agent = Agent(df)
+                    result = agent.chat(query)
+                    st.write("Result:")
+                    st.write(result)
 
-            # Clean up temporary audio file
-            os.remove(audio_file_path)
-        else:
-            st.error("No audio data received. Please try recording your query again.")
+                # Clean up temporary audio file
+                os.remove(audio_file_path)
+            except sr.RequestError as e:
+                st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            except sr.UnknownValueError:
+                st.error("Google Speech Recognition could not understand the audio")
+            except Exception as e:
+                st.error(f"An error occurred while processing the audio file: {e}")
 
     except Exception as e:
         st.error(f"Error processing file: {e}")
