@@ -60,6 +60,7 @@ class StreamlitApp:
                 return ""
         except OSError as e:
             st.error(f"No Default Input Device Available: {e}")
+            st.warning("Ensure that your device has a working microphone and that your browser has permission to access it.")
             return ""
         except Exception as e:
             st.error(f"An error occurred: {e}")
