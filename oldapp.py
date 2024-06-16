@@ -6,7 +6,7 @@ from pandasai import Agent
 import speech_recognition as sr
 
 # Set the API key
-PANDASAI_API_KEY = "your_actual_api_key_here"
+PANDASAI_API_KEY = "$2a$10$MHuoFeCBDOCs.FEqhIMqHuwcZLeb61BQwFRx085ugjCgz4NKxxe9S"
 os.environ["PANDASAI_API_KEY"] = PANDASAI_API_KEY
 
 st.title("Data Analysis with Speech Input")
