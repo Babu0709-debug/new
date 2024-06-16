@@ -104,6 +104,19 @@ class StreamlitApp:
         self.upload_file()
         self.chat_query()
 
+        # JavaScript to request microphone access
+        st.markdown("""
+            <script>
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    console.log('Microphone access granted.');
+                })
+                .catch(function(err) {
+                    console.log('Microphone access denied.', err);
+                });
+            </script>
+            """, unsafe_allow_html=True)
+
 if __name__ == "__main__":
     app = StreamlitApp()
     app.run()
