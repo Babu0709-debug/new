@@ -59,8 +59,14 @@ class StreamlitApp:
                 st.error(f"An error occurred: {e}")
                 return ""
         except OSError as e:
-            st.error(f"No Default Input Device Available: {e}")
-            st.warning("Ensure that your device has a working microphone and that your browser has permission to access it.")
+            st.error("No Default Input Device Available.")
+            st.warning("Please ensure that your device has a working microphone and that your browser has permission to access it. Here are some tips:")
+            st.write("""
+            - **Check Device Settings:** Ensure your microphone is enabled and working. Test it with another application to verify.
+            - **Browser Permissions:** Make sure your browser has permission to access the microphone. You can usually find this in the browser's settings under privacy or permissions.
+            - **Use a Supported Browser:** Use browsers like Chrome or Firefox, which have robust support for microphone access.
+            - **External Microphone:** If you are using an external microphone, ensure it is properly connected.
+            """)
             return ""
         except Exception as e:
             st.error(f"An error occurred: {e}")
@@ -72,7 +78,7 @@ class StreamlitApp:
                 agent = Agent(self.df)
                 try:
                     result = agent.chat(query)
-                    st.write(type(result))
+                    st.write(result)
                 except Exception as e:
                     st.error(f"Error processing query: {e}")
             else:
