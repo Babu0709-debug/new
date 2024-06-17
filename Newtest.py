@@ -19,14 +19,17 @@ if uploaded_file is not None:
         file_extension = uploaded_file.name.split('.')[-1].lower()
 
         if file_extension == 'csv':
-            df = pd.read_csv(uploaded_file)
+            data = pd.read_csv(uploaded_file)
         elif file_extension in ['xlsx', 'xls']:
-            df = pd.read_excel(uploaded_file)
+            data = pd.read_excel(uploaded_file)
         else:
             st.write("Unsupported file format")
         
-        #df = SmartDataframe(data)
+        df = SmartDataframe(data)
         st.dataframe(df.head())
+
+        # Debug: Check the SmartDataframe initialization
+        st.write(f"SmartDataframe type: {type(df)}")
 
         try:
             query = speech_to_text(language='en')
@@ -38,6 +41,10 @@ if uploaded_file is not None:
                 st.write(f"Query content: {query}")
 
                 agent = Agent(df)
+                
+                # Debug: Check the Agent initialization
+                st.write(f"Agent type: {type(agent)}")
+
                 result = agent.chat(query)
                 
                 # Debug: Check the result returned from the agent
