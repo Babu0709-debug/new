@@ -13,28 +13,14 @@ st.title("Data Analysis with Speech Input")
 
 uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
 st.write(uploaded_file)
-if uploaded_file is not None:
-    try:
-        file_extension = uploaded_file.name.split('.')[-1].lower()
-            #st.write(file_extension)
-        if file_extension == 'csv':
-            data = pd.read_csv(uploaded_file)
-            
-        elif file_extension in ['xlsx', 'xls']:
+file_extension = uploaded_file.name.split('.')[-1].lower()
+if file_extension in ['xlsx', 'xls']:
             data = pd.read_excel(uploaded_file)
-        else:
-            st.write("Unsupported file format")
-        
-        st.write(data.head())
+user_query = st.text_input("Enter your query:", "show top 10 Amount by Customer")
+st.write(user_query)
+agent = Agent(data)
+st.write(agent)
+result = agent.chat(user_query)
+st.write(result)
 
-        user_query = st.text_input("Enter your query:", "show top 10 Amount by Customer")
-        if user_query:
-            st.write(user_query)
-            agent = Agent(data)
-            st.write(agent)
-            result = agent.chat(user_query)
-            st.write(result)
-
-    except Exception as e:
-        st.write(f"Error processing file: {e}")
 
