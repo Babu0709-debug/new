@@ -48,7 +48,7 @@ def main():
             
             # Display result
             st.write("User Query:", query)
-            st.write("PandasAI Response:", result)
+            result
         else:
             st.warning("No speech input detected. Please try again.")
     
