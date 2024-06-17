@@ -12,19 +12,20 @@ os.environ["PANDASAI_API_KEY"] = PANDASAI_API_KEY
 st.title("Data Analysis with Speech Input")
 
 uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
-
+st.write(uploaded_file)
 if uploaded_file is not None:
     try:
         file_extension = uploaded_file.name.split('.')[-1].lower()
-
+         st.write(file_extension)
         if file_extension == 'csv':
             data = pd.read_csv(uploaded_file)
+            
         elif file_extension in ['xlsx', 'xls']:
             data = pd.read_excel(uploaded_file)
         else:
             st.write("Unsupported file format")
         
-        df=st.write(data)
+        st.write(data.head())
 
         user_query = st.text_input("Enter your query:", "show top 10 Amount by Customer")
         if user_query:
