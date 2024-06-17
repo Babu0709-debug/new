@@ -1,67 +1,69 @@
-import os
-import pandas as pd
 import streamlit as st
-from pandasai import Agent
-from pandasai.helpers.cache import Cache
+import pandas as pd
+import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
+from pandasai import Agent
+from pandasai import SmartDataframe
+import speech_recognition as sr
 
 # Set the API key
 PANDASAI_API_KEY = "$2a$10$PBlknZ8TbfB9QGzjvEU1g.Z5Nw9p4ldw2w4vSc/VJismDrVrO9X7G"
 os.environ["PANDASAI_API_KEY"] = PANDASAI_API_KEY
 
-# Function to generate a dummy DataFrame (you can replace this with your actual data loading)
-def generate_dummy_data():
-    data = {
-        'State': ['California', 'Texas', 'New York', 'Florida', 'Illinois', 'Pennsylvania', 'Ohio', 'Georgia', 'North Carolina', 'Michigan'],
-        'Sales': [15000, 12000, 18000, 9000, 13500, 11000, 9500, 14500, 13000, 12500]
-    }
-    df = pd.DataFrame(data)
-    return df
+st.title("Data Analysis with Speech Input")
 
-# Function to initialize PandasAI Agent
-def initialize_agent(data):
-    # Clear the existing cache
-    Cache().clear()
-    
-    # Create the PandasAI Agent
-    agent = Agent(data)
-    
-    return agent
+uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
 
-# Streamlit app
-def main():
-    st.title('Data Analysis with Speech Input')
-    
-    # Generate or load your actual DataFrame
-    # In this case, we'll use a dummy DataFrame
-    dummy_data = generate_dummy_data()
-    
-    # Initialize PandasAI Agent with dummy data
-    agent = initialize_agent(dummy_data)
-    
+if uploaded_file is not None:
     try:
-        # Speech to text input
-        query_from_speech = speech_to_text(language='en')
+        file_extension = uploaded_file.name.split('.')[-1].lower()
+
+        if file_extension == 'csv':
+            data = pd.read_csv(uploaded_file)
+        elif file_extension in ['xlsx', 'xls']:
+            data = pd.read_excel(uploaded_file)
+        else:
+            st.write("Unsupported file format")
         
-        # Display a text input box to manually enter a query if speech input fails or is not used
-        query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
-        
-        if query_from_speech:
-            query = query_from_speech
-        
+        st.dataframe(data.head())
+
+        # Debug: Check the SmartDataframe initialization
+        st.write(f"SmartDataframe type: {type(data)}")
+
+        user_query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
+
+        if st.button("Submit"):
+            try:
+                # Create the agent and get the result
+                agent = Agent(data)
+                result = agent.chat(user_query)
+                st.write(f"Result: {result}")
+            except Exception as e:
+                st.write(f"Query processing failed: {e}")
+
+        query = speech_to_text(language='en')
         if query:
-            # Perform query with PandasAI Agent
+            st.write(f"Recognized query: {query}")
+
+            # Debug: Check the type and content of the recognized query
+            st.write(f"Query type: {type(query)}")
+            st.write(f"Query content: {query}")
+
+            agent = Agent(data)
+            
+            # Debug: Check the Agent initialization
+            st.write(f"Agent type: {type(agent)}")
+
             result = agent.chat(query)
             
-            # Display result
-            st.write("User Query:", query)
-            st.write("PandasAI Response:")
-            st.write(result)  # Display the result from PandasAI
-        else:
-            st.warning("No speech input detected and no query entered. Please provide a query.")
-    
-    except Exception as e:
-        st.error(f"Error occurred: {str(e)}")
+            # Debug: Check the result returned from the agent
+            st.write(f"Result type: {type(result)}")
+            st.write(f"Result content: {result}")
 
-if __name__ == "__main__":
-    main()
+            st.write(result)
+        else:
+            st.write("Could not recognize any speech. Please try again.")
+    except Exception as e:
+        st.write(f"Error processing the uploaded file: {e}")
+else:
+    st.write("Please upload a CSV or Excel file.")
