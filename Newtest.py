@@ -3,8 +3,7 @@ import pandas as pd
 import streamlit as st
 from pandasai import Agent
 from pandasai.helpers.cache import Cache
-from streamlit_mic_recorder import mic_recorder, speech_to_text
-import speech_recognition as sr
+from streamlit_mic_recorder import speech_to_text
 
 # Set the API key
 PANDASAI_API_KEY = "$2a$10$PBlknZ8TbfB9QGzjvEU1g.Z5Nw9p4ldw2w4vSc/VJismDrVrO9X7G"
@@ -35,15 +34,19 @@ def main():
         # Initialize PandasAI Agent with uploaded data
         agent = initialize_agent(uploaded_file)
         
-        # Speech to text input
-        query = speech_to_text(language='en')
+        try:
+            # Speech to text input
+            query = speech_to_text(language='en')
+            
+            # Perform query with PandasAI Agent
+            result = agent.chat(query)
+            
+            # Display result
+            st.write("User Query:", query)
+            st.write("PandasAI Response:", result)
         
-        # Perform query with PandasAI Agent
-        result = agent.chat(query)
-        
-        # Display result
-        st.write("User Query:", query)
-        st.write("PandasAI Response:", result)
+        except Exception as e:
+            st.error(f"Error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main()
