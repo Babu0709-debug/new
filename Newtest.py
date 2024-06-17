@@ -22,10 +22,11 @@ if uploaded_file is not None:
             data = pd.read_csv(uploaded_file)
         elif file_extension in ['xlsx', 'xls']:
             data = pd.read_excel(uploaded_file)
-            df =SmartDataframe(data)
+            
         else:
             st.write("Unsupported file format")
-
+            
+        df =SmartDataframe(data)
         st.dataframe(df.head())
 
         try:
