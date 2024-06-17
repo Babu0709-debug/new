@@ -26,10 +26,10 @@ if uploaded_file is not None:
             st.write("Unsupported file format")
         
         #df = SmartDataframe(data)
-        st.dataframe(df.head())
+        st.dataframe(data.head())
 
         # Debug: Check the SmartDataframe initialization
-        st.write(f"SmartDataframe type: {type(df)}")
+        st.write(f"SmartDataframe type: {type(data)}")
 
         try:
             query = speech_to_text(language='en')
