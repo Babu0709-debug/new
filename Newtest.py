@@ -25,38 +25,44 @@ if uploaded_file is not None:
         else:
             st.write("Unsupported file format")
         
-        #df = SmartDataframe(data)
         st.dataframe(data.head())
 
         # Debug: Check the SmartDataframe initialization
         st.write(f"SmartDataframe type: {type(data)}")
 
-        try:
-            query = speech_to_text(language='en')
-            if query:
-                st.write(f"Recognized query: {query}")
-                
-                # Debug: Check the type and content of the recognized query
-                st.write(f"Query type: {type(query)}")
-                st.write(f"Query content: {query}")
+        user_query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
 
+        if st.button("Submit"):
+            try:
+                # Create the agent and get the result
                 agent = Agent(data)
-                
-                # Debug: Check the Agent initialization
-                st.write(f"Agent type: {type(agent)}")
+                result = agent.chat(user_query)
+                st.write(f"Result: {result}")
+            except Exception as e:
+                st.write(f"Query processing failed: {e}")
 
-                result = agent.chat(query)
-                
-                # Debug: Check the result returned from the agent
-                st.write(f"Result type: {type(result)}")
-                st.write(f"Result content: {result}")
+        query = speech_to_text(language='en')
+        if query:
+            st.write(f"Recognized query: {query}")
 
-                st.write(result)
-            else:
-                st.write("Could not recognize any speech. Please try again.")
-        except Exception as e:
-            st.write(f"Speech-to-text conversion failed: {e}")
+            # Debug: Check the type and content of the recognized query
+            st.write(f"Query type: {type(query)}")
+            st.write(f"Query content: {query}")
 
+            agent = Agent(data)
+            
+            # Debug: Check the Agent initialization
+            st.write(f"Agent type: {type(agent)}")
+
+            result = agent.chat(query)
+            
+            # Debug: Check the result returned from the agent
+            st.write(f"Result type: {type(result)}")
+            st.write(f"Result content: {result}")
+
+            st.write(result)
+        else:
+            st.write("Could not recognize any speech. Please try again.")
     except Exception as e:
         st.write(f"Error processing the uploaded file: {e}")
 else:
