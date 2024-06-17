@@ -29,8 +29,8 @@ if uploaded_file:
         result = agent.chat(user_query)
         
         # Convert the result to a DataFrame
-        result_df = pd.DataFrame(result)
+        #result_df = pd.DataFrame(result)
 
         # Display the result
         st.write("Query Result:")
-        st.dataframe(result_df)
+        st.write(result)
