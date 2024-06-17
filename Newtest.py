@@ -9,7 +9,7 @@ from streamlit_mic_recorder import mic_recorder, speech_to_text
 PANDASAI_API_KEY = "$2a$10$PBlknZ8TbfB9QGzjvEU1g.Z5Nw9p4ldw2w4vSc/VJismDrVrO9X7G"
 os.environ["PANDASAI_API_KEY"] = PANDASAI_API_KEY
 
-# Function to generate a dummy DataFrame
+# Function to generate a dummy DataFrame (you can replace this with your actual data loading)
 def generate_dummy_data():
     data = {
         'State': ['California', 'Texas', 'New York', 'Florida', 'Illinois', 'Pennsylvania', 'Ohio', 'Georgia', 'North Carolina', 'Michigan'],
@@ -32,7 +32,8 @@ def initialize_agent(data):
 def main():
     st.title('Data Analysis with Speech Input')
     
-    # Generate dummy DataFrame
+    # Generate or load your actual DataFrame
+    # In this case, we'll use a dummy DataFrame
     dummy_data = generate_dummy_data()
     
     # Initialize PandasAI Agent with dummy data
@@ -40,8 +41,13 @@ def main():
     
     try:
         # Speech to text input
-        user_query = speech_to_text(language='en')
+        query_from_speech = speech_to_text(language='en')
+        
+        # Display a text input box to manually enter a query if speech input fails or is not used
         query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
+        
+        if query_from_speech:
+            query = query_from_speech
         
         if query:
             # Perform query with PandasAI Agent
@@ -49,10 +55,10 @@ def main():
             
             # Display result
             st.write("User Query:", query)
-            st.write("PandasAI Response:",result)
+            st.write("PandasAI Response:")
             st.write(result)  # Display the result from PandasAI
         else:
-            st.warning("No speech input detected. Please try again.")
+            st.warning("No speech input detected and no query entered. Please provide a query.")
     
     except Exception as e:
         st.error(f"Error occurred: {str(e)}")
