@@ -28,33 +28,10 @@ if uploaded_file is not None:
 
         user_query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
         if user_query:
-            agent = Agent(SmartDataframe(data))
+            agent = Agent(data)
             result = agent.chat(user_query)
             st.write(result)
 
     except Exception as e:
         st.write(f"Error processing file: {e}")
 
-# Optional: Add microphone support (example using streamlit_mic_recorder and speech_recognition)
-st.header("Voice Input")
-if st.button("Record"):
-    try:
-        # Record audio from the microphone
-        audio_data = mic_recorder()
-        st.audio(audio_data, format='audio/wav')
-
-        # Convert speech to text
-        recognizer = sr.Recognizer()
-        with sr.AudioFile(audio_data) as source:
-            audio = recognizer.record(source)
-        speech_text = recognizer.recognize_google(audio)
-
-        st.write(f"Recognized speech: {speech_text}")
-
-        if speech_text:
-            agent = Agent(SmartDataframe(data))
-            result = agent.chat(speech_text)
-            st.write(result)
-
-    except Exception as e:
-        st.write(f"Error with voice input: {e}")
