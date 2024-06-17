@@ -25,7 +25,7 @@ if uploaded_file is not None:
         else:
             st.write("Unsupported file format")
         
-        df = SmartDataframe(data)
+        #df = SmartDataframe(data)
         st.dataframe(df.head())
 
         # Debug: Check the SmartDataframe initialization
@@ -40,7 +40,7 @@ if uploaded_file is not None:
                 st.write(f"Query type: {type(query)}")
                 st.write(f"Query content: {query}")
 
-                agent = Agent(df)
+                agent = Agent(data)
                 
                 # Debug: Check the Agent initialization
                 st.write(f"Agent type: {type(agent)}")
