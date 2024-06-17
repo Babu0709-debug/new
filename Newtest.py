@@ -49,7 +49,7 @@ def main():
             
             # Display result
             st.write("User Query:", query)
-            st.write("PandasAI Response:"result)
+            st.write("PandasAI Response:",result)
             st.write(result)  # Display the result from PandasAI
         else:
             st.warning("No speech input detected. Please try again.")
