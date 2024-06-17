@@ -16,7 +16,7 @@ st.write(uploaded_file)
 if uploaded_file is not None:
     try:
         file_extension = uploaded_file.name.split('.')[-1].lower()
-            st.write(file_extension)
+            #st.write(file_extension)
         if file_extension == 'csv':
             data = pd.read_csv(uploaded_file)
             
