@@ -24,21 +24,21 @@ if uploaded_file is not None:
         else:
             st.write("Unsupported file format")
         
-        st.dataframe(data.head())
+        #st.dataframe(data.head())
 
         # Initialize SmartDataframe
         smart_data = SmartDataframe(data)
         
         # Debug: Check the SmartDataframe initialization
-        st.write(f"SmartDataframe type: {type(smart_data)}")
-        st.write(f"SmartDataframe content: {smart_data.head()}")
+        st.write(f"SmartDataframe type: {type(data)}")
+        st.write(f"SmartDataframe content: {data.head()}")
 
         user_query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
 
         if st.button("Submit"):
             try:
                 # Create the agent and get the result
-                agent = Agent(smart_data)
+                agent = Agent(data)
                 st.write(f"Agent initialized with type: {type(agent)}")
                 result = agent.chat(user_query)
                 st.write(f"Result type: {type(result)}")
@@ -54,7 +54,7 @@ if uploaded_file is not None:
             st.write(f"Query type: {type(query)}")
             st.write(f"Query content: {query}")
 
-            agent = Agent(smart_data)
+            agent = Agent(data)
             
             # Debug: Check the Agent initialization
             st.write(f"Agent type: {type(agent)}")
