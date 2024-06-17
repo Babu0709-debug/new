@@ -29,7 +29,7 @@ if uploaded_file is not None:
         user_query = st.text_input("Enter your query:", "show top 10 Amount by Customer")
         if user_query:
             agent = Agent(st.write(data))
-            result = agent.chat(user_query)
+            result = agent.chat(st.write(user_query))
             st.write(result)
 
     except Exception as e:
