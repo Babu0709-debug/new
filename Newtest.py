@@ -22,11 +22,10 @@ if uploaded_file is not None:
             data = pd.read_csv(uploaded_file)
         elif file_extension in ['xlsx', 'xls']:
             data = pd.read_excel(uploaded_file)
-            
         else:
             st.write("Unsupported file format")
-            
-        df =SmartDataframe(data)
+        
+        df = SmartDataframe(data)
         st.dataframe(df.head())
 
         try:
@@ -34,7 +33,7 @@ if uploaded_file is not None:
             if query:
                 st.write(f"Recognized query: {query}")
                 agent = Agent(df)
-                result = agent.chat(agent)
+                result = agent.chat(query)
                 st.write(result)
             else:
                 st.write("Could not recognize any speech. Please try again.")
