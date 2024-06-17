@@ -18,9 +18,10 @@ if uploaded_file is not None:
         file_extension = uploaded_file.name.split('.')[-1].lower()
 
         if file_extension == 'csv':
-            df = pd.read_csv(uploaded_file)
+            data = pd.read_csv(uploaded_file)
         elif file_extension in ['xlsx', 'xls']:
-            df = pd.read_excel(uploaded_file)
+            data = pd.read_excel(uploaded_file)
+            df =SmartDataframe(data)
         else:
             st.write("Unsupported file format")
 
