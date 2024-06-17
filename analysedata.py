@@ -5,7 +5,7 @@ from pandasai import Agent  # Ensure this import is correct
 import speech_recognition as sr 
 #from distutils.version import LooseVersion
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$PBlknZ8TbfB9QGzjvEU1g.Z5Nw9p4ldw2w4vSc/VJismDrVrO9X7G"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$9NAC4c6FlSY2x/IpGioyS.XZyxZUsxgwJwqd0KKyALJwmli/LGo7q"
 
 def analyze_data(df):
     return df.describe()
