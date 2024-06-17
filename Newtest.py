@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from streamlit_mic_recorder import mic_recorder, speech_to_text
-from pandasai import Agent
-from pandasai import SmartDataframe
+from pandasai import Agent, SmartDataframe
 import speech_recognition as sr
 
 # Set the API key
@@ -27,6 +26,9 @@ if uploaded_file is not None:
         
         st.dataframe(data.head())
 
+        # Initialize SmartDataframe
+        #smart_data = SmartDataframe(data)
+        
         # Debug: Check the SmartDataframe initialization
         st.write(f"SmartDataframe type: {type(data)}")
 
