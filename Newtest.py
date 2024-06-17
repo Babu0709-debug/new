@@ -4,7 +4,7 @@ import pandas as pd
 from pandasai import Agent
 
 # Set your PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$PBlknZ8TbfB9QGzjvEU1g.Z5Nw9p4ldw2w4vSc/VJismDrVrO9X7G"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$9NAC4c6FlSY2x/IpGioyS.XZyxZUsxgwJwqd0KKyALJwmli/LGo7q"
 # Set a custom cache file path
 os.environ["PANDASAI_CACHE"] = r"c:\path\to\new\cache\file.db"
 
