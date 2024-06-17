@@ -45,7 +45,7 @@ if uploaded_file is not None:
                 # Debug: Check the Agent initialization
                 st.write(f"Agent type: {type(agent)}")
 
-                result = agent.chat(query)
+                result = agent.chat("show me top 10 sales")
                 
                 # Debug: Check the result returned from the agent
                 st.write(f"Result type: {type(result)}")
