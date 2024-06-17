@@ -16,6 +16,7 @@ st.write(uploaded_file)
 file_extension = uploaded_file.name.split('.')[-1].lower()
 if file_extension in ['xlsx', 'xls']:
             data = pd.read_excel(uploaded_file)
+            st.write(data.head())
 user_query = st.text_input("Enter your query:", "show top 10 Amount by Customer")
 st.write(user_query)
 agent = Agent(data)
