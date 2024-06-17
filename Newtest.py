@@ -6,7 +6,7 @@ from pandasai import Agent, SmartDataframe
 import speech_recognition as sr
 
 # Set the API key
-PANDASAI_API_KEY = "$2a$10$PBlknZ8TbfB9QGzjvEU1g.Z5Nw9p4ldw2w4vSc/VJismDrVrO9X7G"
+PANDASAI_API_KEY = "$2a$10$PBlknZ8TbfB9QGzjvEU1g.Z5Nw9p4ldw2w4vSc/VJismDrVrO9X7G"  # Replace with your actual API key
 os.environ["PANDASAI_API_KEY"] = PANDASAI_API_KEY
 
 st.title("Data Analysis with Speech Input")
@@ -24,20 +24,37 @@ if uploaded_file is not None:
         else:
             st.write("Unsupported file format")
         
-        #st.dataframe(data.head())
-
-        # Initialize SmartDataframe
-        #smart_data = SmartDataframe(data)
-        
-        # Debug: Check the SmartDataframe initialization
-        #st.write(f"SmartDataframe type: {type(data)}")
         st.write(data.head())
 
         user_query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
-        agent = Agent(data)
-        #st.write(f"Agent initialized with type: {type(agent)}")
-        result = agent.chat(user_query)
-        #st.write(f"Result type: {type(result)}")
-        st.write(result)
+        if user_query:
+            agent = Agent(SmartDataframe(data))
+            result = agent.chat(user_query)
+            st.write(result)
 
-       
+    except Exception as e:
+        st.write(f"Error processing file: {e}")
+
+# Optional: Add microphone support (example using streamlit_mic_recorder and speech_recognition)
+st.header("Voice Input")
+if st.button("Record"):
+    try:
+        # Record audio from the microphone
+        audio_data = mic_recorder()
+        st.audio(audio_data, format='audio/wav')
+
+        # Convert speech to text
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(audio_data) as source:
+            audio = recognizer.record(source)
+        speech_text = recognizer.recognize_google(audio)
+
+        st.write(f"Recognized speech: {speech_text}")
+
+        if speech_text:
+            agent = Agent(SmartDataframe(data))
+            result = agent.chat(speech_text)
+            st.write(result)
+
+    except Exception as e:
+        st.write(f"Error with voice input: {e}")
