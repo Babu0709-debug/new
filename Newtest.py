@@ -27,19 +27,22 @@ if uploaded_file is not None:
         st.dataframe(data.head())
 
         # Initialize SmartDataframe
-        #smart_data = SmartDataframe(data)
+        smart_data = SmartDataframe(data)
         
         # Debug: Check the SmartDataframe initialization
-        st.write(f"SmartDataframe type: {type(data)}")
+        st.write(f"SmartDataframe type: {type(smart_data)}")
+        st.write(f"SmartDataframe content: {smart_data.head()}")
 
         user_query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
 
         if st.button("Submit"):
             try:
                 # Create the agent and get the result
-                agent = Agent(data)
+                agent = Agent(smart_data)
+                st.write(f"Agent initialized with type: {type(agent)}")
                 result = agent.chat(user_query)
-                st.write(f"Result: {result}")
+                st.write(f"Result type: {type(result)}")
+                st.write(f"Result content: {result}")
             except Exception as e:
                 st.write(f"Query processing failed: {e}")
 
@@ -51,18 +54,21 @@ if uploaded_file is not None:
             st.write(f"Query type: {type(query)}")
             st.write(f"Query content: {query}")
 
-            agent = Agent(data)
+            agent = Agent(smart_data)
             
             # Debug: Check the Agent initialization
             st.write(f"Agent type: {type(agent)}")
 
-            result = agent.chat(query)
-            
-            # Debug: Check the result returned from the agent
-            st.write(f"Result type: {type(result)}")
-            st.write(f"Result content: {result}")
+            try:
+                result = agent.chat(query)
+                
+                # Debug: Check the result returned from the agent
+                st.write(f"Result type: {type(result)}")
+                st.write(f"Result content: {result}")
 
-            st.write(result)
+                st.write(result)
+            except Exception as e:
+                st.write(f"Error processing query: {e}")
         else:
             st.write("Could not recognize any speech. Please try again.")
     except Exception as e:
