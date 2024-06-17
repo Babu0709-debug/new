@@ -40,7 +40,8 @@ def main():
     
     try:
         # Speech to text input
-        query = speech_to_text(language='en')
+        user_query = speech_to_text(language='en')
+        query = st.text_input("Enter your query:", "show top 5 Amount by Customer")
         
         if query:
             # Perform query with PandasAI Agent
