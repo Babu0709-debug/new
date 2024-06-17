@@ -32,7 +32,7 @@ if uploaded_file is not None:
             if query:
                 st.write(f"Recognized query: {query}")
                 agent = Agent(df)
-                result = agent.chat(st.write(query))
+                result = agent.chat(agent)
                 st.write(result)
             else:
                 st.write("Could not recognize any speech. Please try again.")
