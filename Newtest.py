@@ -32,8 +32,18 @@ if uploaded_file is not None:
             query = speech_to_text(language='en')
             if query:
                 st.write(f"Recognized query: {query}")
+                
+                # Debug: Check the type and content of the recognized query
+                st.write(f"Query type: {type(query)}")
+                st.write(f"Query content: {query}")
+
                 agent = Agent(df)
                 result = agent.chat(query)
+                
+                # Debug: Check the result returned from the agent
+                st.write(f"Result type: {type(result)}")
+                st.write(f"Result content: {result}")
+
                 st.write(result)
             else:
                 st.write("Could not recognize any speech. Please try again.")
