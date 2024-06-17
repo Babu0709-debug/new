@@ -19,7 +19,6 @@ if file_extension in ['xlsx', 'xls']:
 user_query = st.text_input("Enter your query:", "show top 10 Amount by Customer")
 st.write(user_query)
 agent = Agent(data)
-st.write(agent)
 result = agent.chat(user_query)
 st.write(result)
 
