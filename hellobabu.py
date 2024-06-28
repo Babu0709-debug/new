@@ -6,7 +6,7 @@ from pandasai import Agent
 import speech_recognition as sr
 
 # Set the PandasAI API key
-os.environ["PANDASAI_API_KEY"] = "$2a$10$9NAC4c6FlSY2x/IpGioyS.XZyxZUsxgwJwqd0KKyALJwmli/LGo7q"
+os.environ["PANDASAI_API_KEY"] = "$2a$10$u5ND912T6dBJAAXfkkSeteoPqFATTH0W8252czTjWo6dIy1hFOQP."
 
 class StreamlitApp:
     def __init__(self):
