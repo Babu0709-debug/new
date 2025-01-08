@@ -1,5 +1,3 @@
 streamlit
 pandas
 pytds
-io
-upgrade pip
