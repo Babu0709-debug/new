@@ -6,9 +6,9 @@ from io import BytesIO
 st.title('SQL Query Result to Excel Export')
 
 # User inputs
-server = st.text_input('Enter SQL Server Name:', '')
-database = st.text_input('Enter Database Name:', '')
-query = st.text_area('Enter SQL Query:', '')
+server = st.text_input('Enter SQL Server Name:', 'sestosql06.eu.esab.org')
+database = st.text_input('Enter Database Name:', 'ODS_live')
+query = st.text_area('Enter SQL Query:', 'SELECT TOP 10 * FROM Emos.Sales_invoiced')
 
 def fetch_data(server, database, query):
     try:
