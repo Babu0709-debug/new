@@ -18,3 +18,4 @@ av
 streamlit-webrtc
 streamlit_mic_recorder 
 google-cloud-speech
+pytds
