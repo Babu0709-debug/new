@@ -12,8 +12,8 @@ query = st.text_area('Enter SQL Query:', 'SELECT TOP 10 * FROM Emos.Sales_invoic
 
 def fetch_data(server, database, query):
     try:
-        # Establish connection to the database using pymssql
-        conn = pymssql.connect(server=server, database=database, trusted=True)
+        # Establish connection to the database using pymssql (Windows Authentication)
+        conn = pymssql.connect(server=server, database=database)  # No need for username/password for Windows Auth
         cursor = conn.cursor()
         
         # Execute the query
