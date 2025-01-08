@@ -2,4 +2,4 @@ streamlit
 pandas
 pytds
 io
-pip install --upgrade pip
+upgrade pip
