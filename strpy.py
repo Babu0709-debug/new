@@ -1,5 +1,5 @@
 import streamlit as st
-import pytds
+import pymssql
 import pandas as pd
 from io import BytesIO
 
@@ -12,8 +12,8 @@ query = st.text_area('Enter SQL Query:', '')
 
 def fetch_data(server, database, query):
     try:
-        # Establish connection to the database
-        conn = pytds.connect(server=server, database=database, auth=pytds.login.SspiAuth())
+        # Establish connection to the database using pymssql
+        conn = pymssql.connect(server=server, database=database, trusted=True)
         cursor = conn.cursor()
         
         # Execute the query
@@ -24,7 +24,7 @@ def fetch_data(server, database, query):
         # Convert rows to DataFrame
         df = pd.DataFrame(rows, columns=columns)
         return df
-    except pytds.Error as e:
+    except pymssql.Error as e:
         st.error(f"Database error occurred: {e}")
         return None
     except Exception as ex:
@@ -48,7 +48,7 @@ if st.button('Run Query'):
 
             # Save the data to an Excel file
             excel_file = BytesIO()
-            with pd.ExcelWriter(excel_file, engine='xlsxwriter') as writer:
+            with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
                 df.to_excel(writer, index=False, sheet_name='Query Results')
             excel_file.seek(0)
 
